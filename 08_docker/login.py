@@ -15,7 +15,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class LoginForm(FlaskForm):
 
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
-
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Login')
@@ -26,11 +25,6 @@ assert 'APP_SECRET' in os.environ, 'need to set APP_SECRET environ variable.'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(os.environ['DBUSER'],
-#  os.environ['DBPASS'],
-#   os.environ['DBHOST'],
-#   os.environ['DBPORT'],
-#    os.environ['DBNAME'])
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DBURI"]
 app.config['SECRET_KEY'] = os.environ['APP_SECRET']
 db = SQLAlchemy(app)
@@ -63,9 +57,7 @@ class User(UserMixin, db.Model):
 @app.route('/')
 @login_required
 def index():
-
     return 'Hello world'
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -5,7 +5,7 @@ FROM python:3.7
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-
+# make this availabe for e.g. flask shell use
 ENV FLASK_APP login.py
 
 # run web app as web user
