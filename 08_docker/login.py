@@ -25,7 +25,12 @@ class LoginForm(FlaskForm):
 assert 'APP_SECRET' in os.environ, 'need to set APP_SECRET environ variable.'
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/cs6'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(os.environ['DBUSER'],
+ os.environ['DBPASS'],
+  os.environ['DBHOST'],
+  os.environ['DBPORT'],
+   os.environ['DBNAME'])
 app.config['SECRET_KEY'] = os.environ['APP_SECRET']
 db = SQLAlchemy(app)
 
