@@ -1,0 +1,27 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}SocketIO chat demo {% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Chat demo</h1>
+
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+  </div>
+  <div class="page-content">
+    <div class="col-md-12">
+      Hello world chat stuff!
+    </div>
+  </div>
+
+
+</div>
+
+{% endblock %}
