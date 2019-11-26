@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 from flask import render_template, redirect, request, url_for, flash
 
 from flask_wtf import FlaskForm
@@ -9,6 +9,8 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email
 
 from flask_bootstrap import Bootstrap
+
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class LoginForm(FlaskForm):
 
@@ -30,12 +32,14 @@ db = SQLAlchemy(app)
 Bootstrap(app)
 
 login_manager = LoginManager(app)
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'login' # route or function where login occurs...
 
 # create model
-class User(db.Model):
+class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(64), unique=True, index=True)
+    username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
 
     @property
@@ -51,7 +55,9 @@ class User(db.Model):
 
 
 @app.route('/')
+@login_required
 def index():
+
     return 'Hello world'
 
 
@@ -63,21 +69,28 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
-            next = request.args.get('next')
 
-            # check that it is a local route!
-            if next is None or not next.startswith('/'):
-                next = url_for('index')
-            return redirect(next)
+            return redirect(url_for('secret_page'))
         flash('invalid username or password.')
 
     return render_template('login.html', form=form)
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out')
+    return redirect(url_for('index'))
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+@app.route('/secret')
+@login_required
+def secret_page():
+    return 'This is the secret of this application'
 
 if __name__ == '__main__':
     app.run(debug=True)
